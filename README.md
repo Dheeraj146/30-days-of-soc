@@ -35,7 +35,6 @@ Build practical experience across:
 
 | Day | Focus | Status |
 |---|---|---|
-| Day 0 | Repository Setup | ✅ |
 | Day 1 | SOC Fundamentals | ⬜ |
 | Day 2 | Networking for SOC | ⬜ |
 | Day 3 | Linux Fundamentals | ⬜ |
