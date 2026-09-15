@@ -1,273 +1,580 @@
 # Day 1 — SOC Fundamentals
 
-**Focus:** Security Operations Center (SOC) fundamentals, security monitoring, security tooling, log management, and the flow from raw telemetry to alerts and incidents.
+## Focus
+
+Security Operations Center (SOC), SOC functions and roles, security monitoring, logs and events, alerts and incidents, incident response, SIEM, log management, security tools, and the complete movement of security telemetry from source systems to a SOC analyst.
 
 ## Objective
 
-Understand how a modern SOC operates, what a SOC is responsible for, how security telemetry moves from monitored systems into a SIEM, how analysts work with events and alerts, and how incidents progress through investigation and response.
-
----
-
-## 1. What is a SOC?
-
-A **Security Operations Center (SOC)** is a centralized security function responsible for continuously monitoring an organization's digital environment, detecting suspicious or malicious activity, investigating security alerts, responding to incidents, and improving the organization's security posture.
-
-A SOC typically brings together:
-
-- People — analysts, engineers, incident responders, threat hunters, and management
-- Processes — monitoring, triage, investigation, escalation, response, recovery, and continuous improvement
-- Technology — SIEM, EDR/XDR, IDS/IPS, firewalls, VPN infrastructure, SOAR, threat-intelligence platforms, and other security controls
-
-The SOC acts as an operational security layer between an organization's infrastructure and the threats targeting it.
-
-### High-level SOC flow
+The objective of Day 1 is to understand **how a SOC operates as an end-to-end security function**. The goal is not simply to memorize definitions of SIEM, EDR, IDS, or other security tools. The goal is to understand how **people, processes, and technology** work together to monitor an environment, identify suspicious behavior, investigate alerts, respond to incidents, document findings, and improve security operations.
 
 ```text
 Network / Cloud / Users / Endpoints / Applications
-                        |
-                        v
-              Logs + Security Telemetry
-                        |
-                        v
-                Log Management / SIEM
-                        |
-             Collection + Parsing
-                        |
-              Normalization + Enrichment
-                        |
-                 Correlation / Rules
-                        |
-                        v
-                     Alerts
-                        |
-                        v
-                   SOC Analyst
-                        |
-             Triage + Investigation
-                        |
-             +----------+----------+
-             |                     |
-          Benign / FP          Suspicious
-                                   |
-                                   v
-                                Incident
-                                   |
-                                   v
+                         |
+                         v
+                Logs / Security Telemetry
+                         |
+                         v
+              Collection / Ingestion
+                         |
+                         v
+              Parsing / Normalization
+                         |
+                         v
+                    Enrichment
+                         |
+                         v
+              Storage / Indexing
+                         |
+                         v
+           Detection / Correlation / Analytics
+                         |
+                         v
+                       ALERT
+                         |
+                         v
+                    SOC Analyst
+                         |
+                       Triage
+                         |
+                +--------+--------+
+                |                 |
+             Benign           Suspicious
+                |                 |
+             Close               v
+                         Investigation
+                               |
+                               v
+                            Incident
+                               |
+                               v
                        Incident Response
-                                   |
-                                   v
-                         Recovery + Lessons
-                                   |
-                                   v
-                         Detection Improvement
+                               |
+                               v
+                    Recovery / Remediation
+                               |
+                               v
+                         Lessons Learned
+                               |
+                               v
+                     Detection Improvement
 ```
 
 ---
 
-## 2. Key Functions of a SOC
+# 1. What Is a SOC?
 
-### 2.1 Continuous Monitoring
+A **Security Operations Center (SOC)** is a centralized security function responsible for monitoring an organization's digital environment, detecting suspicious or malicious activity, investigating security alerts, coordinating incident response, documenting findings, and continuously improving the organization's security posture.
 
-A SOC monitors systems, networks, applications, identities, endpoints, and cloud environments continuously to identify abnormal or suspicious activity.
+A SOC provides visibility across many parts of an organization, including endpoints, servers, networks, applications, identities, cloud environments, and security controls.
 
-Examples include:
+A modern organization can generate an enormous volume of security telemetry. Thousands of endpoints, servers, users, applications, firewalls, VPN gateways, cloud services, and security products may all produce events. It is not practical for analysts to manually inspect every event. The SOC therefore uses technology and processes to collect, process, prioritize, and investigate the activity that matters.
+
+A SOC is not simply a room containing analysts and dashboards. It is an operational capability that continuously asks questions such as:
+
+- What is happening in the environment?
+- Which activity is expected and which is suspicious?
+- Which alerts require immediate attention?
+- Is the alert a true positive or false positive?
+- Which user, endpoint, server, application, or network segment is involved?
+- What happened before the suspicious activity?
+- What happened after it?
+- How far has an attacker progressed?
+- What evidence supports the conclusion?
+- What is the scope and potential impact?
+- What response is appropriate?
+- How can the same activity be detected more effectively in the future?
+
+## 1.1 Three Pillars of a SOC
+
+### People
+
+People perform investigation, decision-making, response, communication, and security engineering. Typical personnel include SOC analysts, incident responders, threat hunters, detection engineers, security engineers, malware analysts, digital forensics specialists, and SOC managers.
+
+### Processes
+
+Processes provide repeatable procedures for monitoring, triage, escalation, investigation, incident classification, containment, eradication, recovery, documentation, and post-incident improvement.
+
+### Technology
+
+Technology provides telemetry, detection, analysis, automation, and response capabilities. Common technologies include SIEM, SOAR, EDR/XDR, IDS/IPS, firewalls, VPN systems, identity platforms, threat-intelligence platforms, vulnerability-management systems, and log-management platforms.
+
+**Important:** No single security product provides complete visibility. A SOC becomes more effective when telemetry from multiple layers is correlated and interpreted together.
+
+---
+
+# 2. Key Functions of a SOC
+
+The major SOC functions studied today are **continuous monitoring, threat detection, incident response, reporting and documentation, and continuous improvement**.
+
+## 2.1 Continuous Monitoring
+
+Continuous monitoring means maintaining ongoing visibility into security-relevant activity across the organization's environment.
+
+A SOC may monitor:
+
+- Endpoints and workstations
+- Servers
+- Active Directory and identity systems
+- Network devices
+- Firewalls
+- VPN gateways
+- DNS infrastructure
+- Applications
+- Databases
+- Cloud services
+- Email systems
+- Security products
+
+The purpose is not for analysts to manually inspect every event. Enterprise environments can generate huge volumes of telemetry. Instead, the SOC uses automated collection, filtering, parsing, correlation, detection rules, and analytics to surface activity that requires human attention.
+
+### Examples of monitored activity
 
 - Repeated failed authentication attempts
-- Unusual outbound network connections
-- Suspicious process execution
-- Privilege changes
-- Unexpected administrative activity
+- Successful authentication after many failures
+- Authentication from an unusual location
+- Creation of a new user account
+- Privilege or group-membership changes
+- Suspicious PowerShell execution
+- Unusual process creation
+- Suspicious parent-child process relationships
+- Unexpected outbound network connections
+- DNS requests to suspicious domains
 - Malware detections
-- Changes to critical files or configurations
+- Modification of critical files
+- Firewall allow/deny activity
+- VPN authentication activity
+- Cloud administrative changes
 
-### 2.2 Threat Detection
+### Why continuous monitoring matters
 
-The SOC analyzes collected telemetry to identify indicators of compromise, malicious behavior, policy violations, and other security threats.
+Attackers can operate outside normal business hours. If an account is compromised at night and there is no monitoring, the attacker may have significant time to perform reconnaissance, establish persistence, move laterally, or access sensitive information.
 
-Detection can use:
+Continuous monitoring reduces the time between malicious activity and detection. The SOC therefore contributes to reducing the time an attacker can operate without being discovered.
 
-- Detection rules
-- Correlation logic
-- Signatures
-- Behavioral analytics
-- Threat intelligence
-- Statistical or anomaly-based methods
+---
 
-### 2.3 Incident Response
+## 2.2 Threat Detection
 
-When activity is confirmed or strongly suspected to be malicious, the SOC investigates, contains, eradicates, and supports recovery from the incident.
+Threat detection is the process of identifying activity that may represent malicious behavior, compromise, abuse, or a security-policy violation.
 
-### 2.4 Reporting and Documentation
+Detection can be based on an individual event, but strong detections often depend on **patterns and relationships between multiple events**.
 
-Security investigations need an evidence trail. Analysts document:
+### Signature-based detection
+
+Signature-based detection looks for known patterns associated with known malicious artifacts or behavior. It is useful for known threats but may be less effective when an attacker modifies an artifact or uses a previously unknown technique.
+
+### Rule-based detection
+
+Rule-based detection uses explicit conditions.
+
+```text
+IF failed_login_count >= 10
+AND same_source_ip
+AND within 5 minutes
+THEN generate brute-force alert
+```
+
+### Correlation-based detection
+
+Correlation combines multiple events to identify a meaningful sequence.
+
+```text
+Multiple failed logins
+        +
+Successful authentication
+        +
+Privileged activity
+        +
+Suspicious process execution
+        +
+Suspicious outbound connection
+        ↓
+Potential account compromise
+```
+
+### Behavioral detection
+
+Behavioral detection looks for activity that differs from an established or expected pattern.
+
+### Threat-intelligence-based detection
+
+Observed indicators such as IP addresses, domains, URLs, and file hashes can be compared with threat-intelligence information.
+
+### Anomaly detection
+
+Anomaly detection identifies activity that deviates from a baseline. An anomaly is **not automatically malicious**; it still requires context and investigation.
+
+---
+
+## 2.3 Incident Response
+
+Incident response is the structured process used when suspicious activity is confirmed or meets an organization's criteria for a security incident.
+
+It is broader than simply blocking an IP address. The organization must understand the incident, determine scope and impact, contain the threat, eradicate the cause, recover affected systems, document the investigation, and improve defenses.
+
+---
+
+## 2.4 Reporting and Documentation
+
+Security investigations require a reliable evidence trail. Documentation allows another analyst, manager, auditor, or incident-response team to understand what happened and why a particular conclusion was reached.
+
+Analysts should document:
 
 - What happened
 - When it happened
-- Which assets and accounts were involved
-- What evidence was found
-- What actions were taken
-- What the impact was
-- What remediation is required
+- Which users were involved
+- Which systems were involved
+- Source and destination information
+- Relevant logs and alerts
+- Evidence collected
+- Investigation steps
+- Timeline of activity
+- Findings
+- Scope
+- Impact
+- Actions performed
+- Containment and remediation
+- Final classification
+- Recommended improvements
 
-### 2.5 Continuous Improvement
-
-A mature SOC uses lessons from incidents, false positives, investigations, and operational metrics to improve detections, processes, playbooks, and security controls.
+Good documentation should explain the analyst's reasoning, not just record the final conclusion.
 
 ---
 
-## 3. How a SOC Works
+## 2.5 Continuous Improvement
 
-A SOC is not simply a dashboard where analysts watch alerts. It is an operational pipeline.
+A mature SOC treats incidents, false positives, missed detections, and analyst feedback as opportunities to improve.
+
+The SOC may ask:
+
+- Why did the detection trigger?
+- Was the alert accurate?
+- Could the activity have been detected earlier?
+- Was enough telemetry available?
+- Did the alert contain sufficient context?
+- Was the escalation path clear?
+- Did the response process work correctly?
+- Could the same attack bypass the detection again?
+- Should the rule be tuned?
+- Should a new detection be created?
+- Should a response playbook be updated?
 
 ```text
-Telemetry
-   ↓
-Collection
-   ↓
-Parsing / Normalization
-   ↓
-Enrichment
-   ↓
-Detection / Correlation
-   ↓
-Alert Generation
-   ↓
-Triage
-   ↓
+Incident / Alert
+      ↓
 Investigation
-   ↓
-Incident Classification
-   ↓
-Response
-   ↓
-Recovery
-   ↓
+      ↓
+Findings
+      ↓
 Lessons Learned
-   ↓
+      ↓
 Detection / Process Improvement
+      ↓
+Better Monitoring
+      ↓
+Better Future Detection
 ```
-
-The goal is to turn large volumes of raw technical data into **actionable security information**.
 
 ---
 
-## 4. SOC Roles
+# 3. How a SOC Works
 
-### L1 — Tier 1 SOC Analyst
+A SOC operates as an end-to-end pipeline. The process begins when activity occurs in the environment and telemetry is generated; the analyst becomes involved after automated collection and detection have provided a security signal.
 
-The first operational layer.
+```text
+1. Activity occurs
+        ↓
+2. Source generates telemetry
+        ↓
+3. Telemetry is collected
+        ↓
+4. Data is parsed
+        ↓
+5. Fields are normalized
+        ↓
+6. Context is enriched
+        ↓
+7. Data is stored / indexed
+        ↓
+8. Detection and correlation run
+        ↓
+9. Alert is generated
+        ↓
+10. Analyst performs triage
+        ↓
+11. Investigation
+        ↓
+12. Classification
+        ↓
+13. Escalation / response
+        ↓
+14. Recovery / remediation
+        ↓
+15. Documentation
+        ↓
+16. Lessons learned
+        ↓
+17. Detection / process improvement
+```
 
-Typical responsibilities:
+### Example
 
-- Monitor security alerts
-- Perform initial triage
-- Validate whether an alert appears legitimate
+Suppose an attacker is attempting to compromise an administrator account.
+
+The authentication system records failed login events. The events are collected and sent to a centralized security platform. The platform extracts information such as username, source IP, timestamp, and authentication result.
+
+A detection rule identifies an unusual number of failures within a short time window and generates an alert. The L1 analyst checks whether the source is expected, whether the account is legitimate, whether a successful login occurred, and whether other suspicious activity is present.
+
+If the activity is suspicious, the investigation expands to endpoint, network, VPN, identity, and threat-intelligence data. If evidence supports compromise, the case is escalated and incident-response actions begin.
+
+Therefore, an alert is not the end of SOC activity. **An alert is the beginning of an analyst-driven investigation.**
+
+---
+
+# 4. SOC Roles and Responsibilities
+
+SOC roles are commonly divided into tiers. The exact responsibilities vary between organizations, but the following model provides a useful operational framework.
+
+## 4.1 L1 — Tier 1 SOC Analyst
+
+The L1 analyst is generally the first human layer handling security alerts. The primary responsibility is **rapid and accurate initial triage**.
+
+### Responsibilities
+
+- Monitor incoming alerts
+- Review alert severity and detection reason
+- Identify source, destination, user, and host
+- Review relevant event details
+- Check surrounding activity
+- Determine whether activity is expected
 - Identify obvious false positives
-- Gather basic contextual information
-- Escalate suspicious or confirmed incidents
+- Collect initial evidence
 - Follow documented playbooks
+- Escalate suspicious activity
+- Document actions and findings
 
-The L1 analyst is generally focused on **alert handling and initial investigation**.
+### L1 workflow
 
-### L2 — Tier 2 SOC Analyst
+```text
+Alert received
+      ↓
+Read alert details
+      ↓
+Identify entities involved
+      ↓
+Check related events
+      ↓
+Expected activity?
+   /          \
+ Yes          No
+  ↓            ↓
+Document     Suspicious?
+Close          ↓
+            Escalate
+               ↓
+               L2
+```
 
-Handles more complex investigations that require deeper analysis.
+L1 is not simply a "basic" role. High-quality L1 triage prevents unnecessary escalation while ensuring genuine threats move quickly to deeper investigation.
 
-Typical responsibilities:
+---
+
+## 4.2 L2 — Tier 2 SOC Analyst
+
+L2 handles investigations requiring deeper technical analysis and correlation across multiple sources.
+
+### Responsibilities
 
 - Investigate escalated alerts
-- Correlate activity across multiple systems
-- Analyze authentication, endpoint, network, and application telemetry
-- Determine attack scope and potential impact
-- Perform deeper threat analysis
-- Recommend or initiate containment actions according to organizational procedures
+- Correlate authentication, endpoint, network, and application data
+- Build event timelines
+- Determine affected systems and accounts
+- Analyze suspicious processes
+- Analyze network connections
+- Determine attack scope
+- Identify likely attack techniques
+- Support containment
+- Escalate complex incidents to L3 or specialized teams
 
-### L3 — Tier 3 / Senior Analyst
+### Example
 
-Handles advanced investigations and specialized security operations.
+L1 receives a brute-force alert. L2 may discover that the attacker eventually authenticated successfully, identify the endpoint used by the account, inspect process execution, examine network connections, and determine whether lateral movement occurred.
 
-Typical responsibilities:
+---
+
+## 4.3 L3 — Tier 3 / Senior Analyst
+
+L3 analysts generally handle advanced investigations and specialized security operations.
+
+### Responsibilities
 
 - Advanced incident investigation
 - Threat hunting
 - Detection engineering
-- Malware and forensic analysis
+- Malware analysis
+- Digital forensics
 - Complex attack-chain analysis
-- Improving detection coverage
-- Developing advanced investigation techniques
-- Supporting major incident response
+- Advanced endpoint investigation
+- Detection tuning
+- Development of new detection rules
+- Investigation of sophisticated or persistent threats
+- Support for major incidents
 
-### SOC Manager
-
-Responsible for operational leadership and overall SOC effectiveness.
-
-Typical responsibilities:
-
-- Team management
-- Incident escalation management
-- SOC processes and procedures
-- Metrics and reporting
-- Staffing and capability planning
-- Risk and compliance coordination
-- Tooling and operational strategy
-- Stakeholder communication
-
-> In real organizations, role boundaries vary. Titles and responsibilities depend on the organization's size, operating model, and maturity.
+L3 work often goes beyond responding to existing alerts. L3 analysts may proactively search for attacker behavior that has not yet generated an alert.
 
 ---
 
-## 5. Logs, Events, Alerts, and Incidents
+## 4.4 SOC Manager
 
-These terms are related but should not be treated as interchangeable.
+The SOC manager is responsible for operational leadership and overall SOC effectiveness.
 
-### Log
+### Responsibilities
 
-A **log** is a recorded piece of information generated by a system, application, network device, security control, or service.
+- Team management
+- Work allocation
+- Escalation management
+- Incident coordination
+- SOC procedures
+- Metrics and reporting
+- Staffing and capability planning
+- Security-tool strategy
+- Risk coordination
+- Compliance coordination
+- Stakeholder communication
+- Operational maturity
 
-Examples:
+### Example SOC metrics
+
+- Alert volume
+- Mean Time to Detect (MTTD)
+- Mean Time to Respond (MTTR)
+- False-positive rate
+- Escalation rate
+- Incident volume
+- Detection coverage
+- SLA compliance
+- Investigation backlog
+
+> Exact responsibilities vary between organizations. Some organizations combine tiers or have separate teams for incident response, threat hunting, detection engineering, malware analysis, and digital forensics.
+
+---
+
+# 5. Logs, Events, Alerts, and Incidents
+
+These concepts are closely related but should not be treated as identical.
+
+## 5.1 What Is a Log?
+
+A **log** is recorded information generated by an operating system, application, network device, security control, cloud service, or other technology component.
+
+Examples include:
 
 ```text
 User authentication succeeded
 User authentication failed
 Process started
+Process terminated
+File modified
 Firewall connection allowed
 Firewall connection denied
 DNS query performed
 VPN connection established
+Service started
+Account created
 ```
 
-### Event
+Logs preserve historical evidence. Analysts can use them to reconstruct activity, identify patterns, troubleshoot systems, support audits, and investigate incidents.
 
-An **event** represents something that happened in a system or environment. A log record is often the stored representation of that event.
+### Common security-log fields
 
-For example:
+A security log may contain:
 
-```text
-Event: A user failed authentication
-Time: 10:15:22
-User: alice
-Source IP: 10.10.10.25
-```
+- Timestamp
+- Hostname
+- Username
+- Source IP
+- Destination IP
+- Source port
+- Destination port
+- Protocol
+- Process name
+- Process ID
+- Event ID
+- Action
+- Result
+- Status
+- Message
 
-### Alert
+The exact fields depend on the source.
 
-An **alert** is generated when security tooling identifies activity that matches a detection condition or otherwise requires analyst attention.
+---
+
+## 5.2 What Is an Event?
+
+An **event** represents something that happened within a system or environment.
 
 Example:
 
 ```text
-5 failed logins for the same account within 60 seconds
-                 ↓
-             Detection rule
-                 ↓
-               ALERT
+Event: User failed authentication
+Time: 10:15:22
+User: alice
+Source IP: 10.10.10.25
+Result: Failure
 ```
 
-An alert is **not automatically an incident**. An analyst must investigate the context and determine its significance.
+Conceptually:
 
-### Incident
+- **Event:** the activity that occurred.
+- **Log:** the recorded information describing that activity.
 
-A **security incident** is a confirmed or sufficiently credible security event that requires response according to the organization's incident-management criteria.
+In practical SOC conversations the terms may sometimes be used interchangeably, but the distinction is useful when learning how security telemetry works.
+
+---
+
+## 5.3 What Is an Alert?
+
+An **alert** is a security notification generated when a security product or detection system identifies activity that matches a detection condition or otherwise requires analyst attention.
+
+Example:
+
+```text
+Observed:
+Failed login
+Failed login
+Failed login
+Failed login
+Failed login
+
+Detection:
+Multiple failures from same source within a time window
+
+Result:
+ALERT — Possible brute-force activity
+```
+
+An alert represents a **security hypothesis or condition requiring evaluation**.
+
+An alert can be:
+
+- A true positive
+- A false positive
+- Benign but unusual activity
+- Expected administrative activity
+- Suspicious activity requiring further investigation
+
+### Critical principle
+
+> **ALERT ≠ INCIDENT**
+
+The analyst must investigate the context before deciding whether the activity represents an incident.
+
+---
+
+## 5.4 What Is an Incident?
+
+A **security incident** is an event or series of events that meets an organization's criteria for requiring a security response.
 
 Example:
 
@@ -278,16 +585,22 @@ Successful login from unusual source
         ↓
 Suspicious PowerShell execution
         ↓
-Outbound connection to suspicious IP
+Credential-access indicators
         ↓
-Confirmed compromise
+Suspicious outbound connection
+        ↓
+Evidence supports compromise
         ↓
 SECURITY INCIDENT
 ```
 
-### Incident Response
+A single suspicious event may require investigation without being classified as an incident. Multiple correlated events can provide much stronger evidence.
 
-**Incident response (IR)** is the structured process used to prepare for, detect, analyze, contain, eradicate, and recover from security incidents.
+---
+
+# 6. Incident Response
+
+**Incident Response (IR)** is the structured approach used to prepare for, detect, analyze, contain, eradicate, and recover from security incidents.
 
 A simplified lifecycle is:
 
@@ -305,190 +618,481 @@ Recovery
 Lessons Learned
 ```
 
-### Disaster
+## 6.1 Preparation
 
-A **disaster** is a major disruptive event that significantly affects business operations or critical services. A cyberattack can contribute to a disaster, but not every security incident is a disaster.
+Preparation occurs before an incident.
 
-Disaster recovery focuses on restoring critical business services and technology after a major disruption.
+It includes:
+
+- Incident-response procedures
+- Escalation contacts
+- Logging and monitoring
+- Backups
+- Response playbooks
+- Forensic capabilities
+- Security tools
+- Communication procedures
+- Defined responsibilities
+
+Preparation ensures that the organization has the capabilities required to respond before a crisis occurs.
+
+## 6.2 Detection and Analysis
+
+The organization identifies suspicious activity and determines what actually happened.
+
+Analysts may examine:
+
+- SIEM alerts
+- Windows/Linux logs
+- Authentication activity
+- Endpoint telemetry
+- Firewall logs
+- DNS logs
+- Network traffic
+- Cloud activity
+- Threat intelligence
+- Process execution
+- File activity
+
+The objective is to establish facts, determine scope, and understand the attack path.
+
+## 6.3 Containment
+
+Containment limits the attacker's ability to continue operating and prevents additional damage.
+
+Possible actions include:
+
+- Isolating an endpoint
+- Disabling a compromised account
+- Revoking sessions or tokens
+- Blocking malicious infrastructure
+- Restricting network access
+- Removing exposed credentials
+
+Containment must consider business impact. Response actions should follow organizational procedures and authorization requirements.
+
+## 6.4 Eradication
+
+Eradication removes the malicious presence or underlying cause.
+
+Examples include:
+
+- Removing malware
+- Removing persistence mechanisms
+- Resetting compromised credentials
+- Removing unauthorized accounts
+- Patching exploited vulnerabilities
+- Correcting insecure configurations
+
+## 6.5 Recovery
+
+Recovery returns systems and services to a trusted operational state. Systems should continue to be monitored after recovery to identify recurrence.
+
+## 6.6 Lessons Learned
+
+After an incident, the organization reviews what happened and identifies improvements to technology, detections, procedures, and training.
 
 ---
 
-## 6. SIEM — Security Information and Event Management
+# 7. Incident vs Disaster
 
-A **SIEM** centralizes security-relevant telemetry and provides capabilities for collection, storage, search, analysis, correlation, alerting, and investigation.
+A **security incident** and a **disaster** are not the same concept.
 
-### How a SIEM processes data
+A security incident is generally an event or set of events requiring security investigation and response.
 
-```text
-Data Sources
-    |
-    +--> Windows
-    +--> Linux
-    +--> Firewalls
-    +--> IDS/IPS
-    +--> EDR
-    +--> VPN
-    +--> Cloud
-    +--> Applications
-    |
-    v
-Log Collection
-    |
-    v
-Parsing
-    |
-    v
-Normalization
-    |
-    v
-Enrichment
-    |
-    v
-Storage / Indexing
-    |
-    v
-Rules / Correlation / Analytics
-    |
-    v
-Alerts
-    |
-    v
-SOC Investigation
-```
-
-### 6.1 Collection
-
-The SIEM receives logs and telemetry from multiple sources.
-
-Collection can happen through agents, collectors, APIs, network protocols, cloud integrations, or other ingestion mechanisms.
-
-### 6.2 Parsing
-
-Raw logs often arrive as unstructured text or vendor-specific formats. Parsing extracts useful fields.
-
-Example:
-
-```text
-Raw:
-Failed login for user admin from 10.10.10.50
-
-Parsed:
-username = admin
-source_ip = 10.10.10.50
-action = failed_login
-```
-
-### 6.3 Normalization
-
-Different products can describe the same activity differently. Normalization maps data into a consistent structure so detection logic can work across sources.
+A disaster is a major disruptive event that significantly affects critical business operations or services.
 
 For example:
+
+```text
+Compromised workstation
+        ↓
+Security Incident
+```
+
+A large ransomware attack that encrypts critical systems, disrupts business operations, and requires major recovery efforts could contribute to a disaster scenario.
+
+### Disaster Recovery
+
+Disaster recovery focuses on restoring critical technology and business services after a major disruption. SOC and incident-response teams may contribute during cyber-related disasters, but disaster recovery is broader than SOC operations.
+
+---
+
+# 8. SIEM — Security Information and Event Management
+
+A **SIEM** is a security platform that centralizes security-relevant telemetry and provides capabilities for collection, storage, search, analysis, correlation, detection, alerting, and investigation.
+
+Without centralized monitoring, an analyst might need to inspect many independent systems:
+
+```text
+Windows logs
+Linux logs
+Firewall logs
+VPN logs
+DNS logs
+EDR telemetry
+Cloud logs
+Application logs
+```
+
+A SIEM brings relevant telemetry into a centralized platform where it can be searched, correlated, analyzed, and used for detection.
+
+### What a SIEM helps analysts investigate
+
+- Which user performed the activity?
+- Which endpoint was involved?
+- What source IP generated the event?
+- What destination did the endpoint contact?
+- Did the same source contact other systems?
+- Was there a successful login after failed attempts?
+- Did suspicious process execution occur afterward?
+- Are there related alerts?
+- Does the activity match known threat indicators?
+
+---
+
+# 9. How a SIEM Collects and Processes Data
+
+This is one of the most important concepts from Day 1.
+
+```text
+                       DATA SOURCES
+                            |
+       +--------------------+--------------------+
+       |                    |                    |
+    Windows               Linux             Firewall
+    Servers                Hosts              / VPN
+       |                    |                    |
+       +--------------------+--------------------+
+                            |
+                            v
+                    DATA COLLECTION
+                            |
+                            v
+                         PARSING
+                            |
+                            v
+                      NORMALIZATION
+                            |
+                            v
+                        ENRICHMENT
+                            |
+                            v
+                    STORAGE / INDEXING
+                            |
+                            v
+               CORRELATION / DETECTION
+                            |
+                            v
+                          ALERT
+                            |
+                            v
+                     SOC ANALYST
+                            |
+                            v
+                      INVESTIGATION
+```
+
+## 9.1 Data Collection
+
+The first step is receiving telemetry from security-relevant sources.
+
+Potential sources include:
+
+- Windows Event Logs
+- Linux system logs
+- Application logs
+- Firewalls
+- IDS/IPS
+- EDR
+- VPN systems
+- DNS infrastructure
+- Cloud audit logs
+- Identity providers
+- Databases
+
+Collection may use agents, collectors, APIs, network protocols, cloud integrations, or other ingestion mechanisms.
+
+The quality of the final investigation depends heavily on whether the required telemetry is collected in the first place.
+
+---
+
+## 9.2 Parsing
+
+Raw logs often arrive as text or vendor-specific structured data. **Parsing extracts individual fields** from the incoming data.
+
+Raw:
+
+```text
+Failed login for user admin from 10.10.10.50
+```
+
+Parsed:
+
+```text
+username  = admin
+source_ip = 10.10.10.50
+action    = failed_login
+```
+
+Parsing is important because detection engines need structured information. It is easier to build flexible detection logic using fields such as username, source IP, action, and result than relying only on an entire message string.
+
+---
+
+## 9.3 Normalization
+
+Different vendors often use different names for the same concept.
 
 ```text
 Vendor A: src_ip
 Vendor B: sourceAddress
 Vendor C: client_ip
+```
 
-Normalized field:
+A normalized representation could use:
+
+```text
 source.ip
 ```
 
-### 6.4 Enrichment
+Normalization makes cross-source searches and detections easier because analysts and detection rules can reason about consistent concepts.
 
-Additional context can be attached to an event, such as:
+---
 
-- Asset information
-- User information
-- GeoIP data
-- Threat-intelligence matches
+## 9.4 Enrichment
+
+Enrichment adds useful context that was not present in the original event.
+
+Possible enrichment includes:
+
+- User identity
+- Asset owner
+- Asset criticality
+- Geographic information
+- IP reputation
 - Domain reputation
-- Vulnerability context
-- Identity information
-
-### 6.5 Correlation and Detection
-
-The SIEM can correlate multiple events to identify patterns that are more meaningful than individual events.
+- Threat-intelligence matches
+- Vulnerability information
+- Identity context
+- Business context
 
 Example:
+
+```text
+Original event:
+Source IP = 203.0.113.50
+
+Enriched context:
+Source IP = 203.0.113.50
+Threat intelligence = Suspicious
+Target asset = Critical server
+Asset owner = Security team
+```
+
+Enrichment helps analysts prioritize alerts and make better decisions with less manual context gathering.
+
+---
+
+## 9.5 Storage and Indexing
+
+Collected telemetry must be stored so it can be searched during detection and investigation.
+
+Common searchable fields include:
+
+- Timestamp
+- Username
+- Source IP
+- Destination IP
+- Hostname
+- Event ID
+- Process name
+- Domain
+- File hash
+- Action
+- Result
+
+Indexing allows analysts and detection systems to locate relevant records efficiently.
+
+Retention requirements depend on organizational requirements, regulatory obligations, investigation needs, storage capacity, and the type of telemetry.
+
+---
+
+## 9.6 Correlation
+
+Correlation connects related events together.
+
+A single failed login may be normal. A large number of failures followed by a successful login, privileged activity, suspicious process execution, and an external connection is much more significant.
 
 ```text
 10 failed logins
       +
 Successful login
       +
-New privileged process
+Privileged activity
       +
-Suspicious outbound connection
+Suspicious process
+      +
+Suspicious network connection
       ↓
 Potential account compromise
 ```
 
-### 6.6 Alert Generation
-
-When detection logic matches, the SIEM creates an alert containing relevant context for analysts.
-
-The SOC then performs triage and investigation.
+Correlation allows the SOC to reason about an **attack sequence** instead of treating every event as an isolated record.
 
 ---
 
-## 7. SIEM vs Log Management
+## 9.7 Detection and Alert Generation
 
-### Log Management System
+Detection logic evaluates processed telemetry against defined conditions.
 
-A log management platform primarily focuses on collecting, transporting, storing, indexing, searching, and retaining logs.
+Example:
 
-### SIEM
+```text
+IF
+    failed_login_count >= 10
+AND
+    same_source_ip
+AND
+    within 5 minutes
 
-A SIEM builds on centralized log management by adding security-focused capabilities such as:
+THEN
+    generate brute-force alert
+```
+
+A useful alert should ideally provide enough context for the analyst to begin investigation, such as the affected account, host, source, timestamps, event count, detection reason, and related evidence.
+
+---
+
+# 10. SIEM vs Log Management
+
+These technologies are related, but their primary objectives differ.
+
+## 10.1 Log Management System
+
+A log-management system primarily manages the lifecycle of logs.
+
+Typical functions include:
+
+- Collecting logs
+- Transporting logs
+- Storing logs
+- Indexing logs
+- Searching logs
+- Retaining logs
+- Managing availability
+
+The central question is:
+
+> **Can we reliably collect, store, search, and retain our logs?**
+
+## 10.2 SIEM
+
+A SIEM includes centralized log-management capabilities but adds security-focused capabilities such as:
 
 - Detection rules
 - Correlation
 - Security analytics
 - Alerting
+- Threat-intelligence integration
 - Investigation workflows
-- Threat intelligence integration
 - Security monitoring
+- Security context
 
-The boundary is not absolute. Modern platforms increasingly combine log management, SIEM, analytics, and response capabilities.
+The central question becomes:
+
+> **What security-relevant activity is occurring, and does the available telemetry indicate a threat?**
+
+### Simplified comparison
+
+```text
+LOG MANAGEMENT
+Collect → Transport → Store → Search → Retain
+
+SIEM
+Collect → Parse → Normalize → Enrich
+        ↓
+Store → Correlate → Detect → Alert
+        ↓
+Investigate → Respond
+```
+
+Modern platforms increasingly combine log-management and SIEM functionality, so the boundary is not always strict.
 
 ---
 
-## 8. How Logs Are Transferred
+# 11. How Logs Can Be Transferred
 
-Logs can move from a source to a centralized platform through several mechanisms.
+Logs must move from the source system to a centralized location before they can be analyzed centrally.
 
-### 8.1 Log Forwarding
+Common mechanisms include:
 
-A source forwards logs to a centralized collector or SIEM.
+1. Log forwarding
+2. Agent-based collection
+3. Network-based logging
+4. API-based collection
+5. File-based collection
+6. Intermediate collectors
+7. Cloud-native integrations
+
+The appropriate method depends on the source system, network architecture, security requirements, reliability requirements, and capabilities of the receiving platform.
+
+## 11.1 Log Forwarding
+
+Log forwarding means a source system sends its log data to another system responsible for receiving or processing it.
 
 ```text
-Endpoint
-   |
-   | Log forwarding
-   v
+Endpoint / Server
+       |
+       | Log forwarding
+       v
 Collector / SIEM
 ```
 
-Examples include agent-based forwarding and network-based log forwarding.
+### Benefits
 
-### 8.2 Agent-Based Collection
+- Centralized visibility
+- Easier searching
+- Centralized detection
+- Easier investigation
+- Reduced need for manual inspection of individual systems
 
-A lightweight agent runs on the endpoint and reads selected logs before securely forwarding them to a central platform.
+## 11.2 Agent-Based Collection
+
+An agent is software installed on an endpoint that collects selected telemetry and forwards it to a centralized platform.
 
 ```text
 Windows / Linux Endpoint
-        |
-      Agent
-        |
-        v
-   SIEM / Collector
+          |
+       Security Agent
+          |
+          v
+     Collector / SIEM
 ```
 
-Advantages include endpoint visibility and controlled collection.
+Agents can collect:
 
-### 8.3 Network-Based Logging
+- Operating-system logs
+- Application logs
+- Security events
+- Process information
+- File activity
+- Endpoint telemetry
 
-Some network and security devices can send logs to a central collector using standardized logging mechanisms such as Syslog.
+### Advantages
+
+- Direct endpoint visibility
+- Centralized configuration
+- Controlled collection
+- Useful for local log sources
+- Endpoint-specific security telemetry
+
+### Considerations
+
+Agents consume endpoint resources and must be securely configured, maintained, upgraded, and monitored.
+
+## 11.3 Network-Based Logging
+
+Network devices and security appliances can send logs across the network to a central collector. A common example is **Syslog**.
 
 ```text
 Firewall
@@ -501,48 +1105,95 @@ Log Collector
 SIEM
 ```
 
-### 8.4 API-Based Collection
+Typical sources include:
 
-A SIEM or collector can periodically retrieve events from a service using an API.
+- Firewalls
+- Routers
+- Switches
+- VPN gateways
+- IDS/IPS devices
+- Network appliances
+
+## 11.4 API-Based Collection
+
+Cloud and SaaS platforms frequently expose security events through APIs.
 
 ```text
 Cloud / SaaS / Security Platform
-             |
-            API
-             |
-             v
-            SIEM
+              |
+             API
+              |
+              v
+        Collector / SIEM
 ```
 
-### 8.5 Log Copy / File-Based Collection
+Important considerations include:
 
-Some systems write logs to files that can be copied, synchronized, or collected by an agent or scheduled process.
+- API authentication
+- Permissions
+- Rate limits
+- Polling intervals
+- Pagination
+- Event delays
+- Duplicate events
+- API failures
+
+## 11.5 File-Based Collection / Log Copy
+
+Some applications write logs to local files. An agent or collector can monitor those files and forward new records.
 
 ```text
-Application Log File
-        |
-        v
-Collector / Agent
-        |
-        v
+Application
+    |
+    v
+Log File
+    |
+    v
+Agent / Collector
+    |
+    v
 SIEM
 ```
 
-The exact method depends on the data source, platform, network architecture, security requirements, and operational constraints.
+Important considerations include log rotation, permissions, duplicate records, partial writes, file changes, and retention.
+
+## 11.6 Collector-Based Architecture
+
+Organizations may place an intermediate collector between data sources and the SIEM.
+
+```text
+Windows ──┐
+Linux ────┤
+Firewall ─┤
+VPN ──────┤
+Cloud ────┤
+Apps ─────┘
+      |
+      v
+Central Log Collector
+      |
+      v
+SIEM
+      |
+      v
+SOC
+```
+
+Collectors can provide buffering, filtering, routing, transformation, and centralized ingestion management.
 
 ---
 
-## 9. Security Tools in a SOC
+# 12. Security Tools Used in a SOC
 
-A SOC normally uses multiple security technologies. Each provides a different control or visibility layer.
+A SOC uses multiple security technologies because each technology provides a different type of visibility or control.
 
-### SIEM
+## 12.1 SIEM
 
-Centralized security telemetry, correlation, detection, alerting, search, and investigation.
+**Security Information and Event Management** centralizes security telemetry and provides search, correlation, detection, alerting, analytics, and investigation capabilities.
 
-### SOAR — Security Orchestration, Automation and Response
+## 12.2 SOAR
 
-Automates repetitive SOC workflows and coordinates actions across security tools.
+**Security Orchestration, Automation and Response** automates repetitive security workflows and coordinates actions across multiple security products.
 
 Example:
 
@@ -555,185 +1206,554 @@ Extract IP
     ↓
 Threat Intelligence Lookup
     ↓
-If malicious
-    ↓
-Block IP / Isolate Host / Create Ticket
+Is IP malicious?
+   /        \
+ Yes        No
+  ↓           ↓
+Block IP    Continue Investigation
+  ↓
+Create Ticket / Notify Analyst
 ```
 
-### EDR — Endpoint Detection and Response
+SOAR is useful for predictable, repetitive processes. Automated response should be carefully designed because an incorrect action can affect legitimate business activity.
 
-Provides endpoint telemetry, detection, investigation, and response capabilities.
+## 12.3 EDR
 
-Typical visibility includes:
+**Endpoint Detection and Response (EDR)** provides endpoint visibility, detection, investigation, and response capabilities.
+
+Depending on the product, telemetry may include:
 
 - Processes
+- Parent-child process relationships
 - Files
 - Network connections
 - User activity
 - Persistence mechanisms
+- Registry activity
+- Command execution
 - Endpoint security events
 
-### XDR — Extended Detection and Response
+EDR is valuable during endpoint investigations because it can provide detailed information about what happened on a host.
 
-Extends detection and response beyond a single endpoint data source by correlating telemetry across multiple security domains such as endpoints, identity, email, network, and cloud.
+## 12.4 XDR
 
-### IDS — Intrusion Detection System
+**Extended Detection and Response (XDR)** extends detection and response across multiple security domains.
 
-Detects suspicious or malicious network or host activity and generates alerts.
+Depending on the platform, telemetry can include:
 
-### IPS — Intrusion Prevention System
-
-Performs detection and can actively block or prevent detected malicious traffic.
-
-### Firewall
-
-Controls network traffic based on defined security policies.
-
-Common policy dimensions include:
-
-- Source
-- Destination
-- Port
-- Protocol
-- Application
+- Endpoints
 - Identity
+- Email
+- Network
+- Cloud
+- Applications
 
-### VPN — Virtual Private Network
+The objective is to correlate security signals across multiple layers rather than investigate each security domain independently.
 
-Provides an encrypted or otherwise protected communication channel between endpoints and networks, depending on the VPN technology and configuration.
+## 12.5 IDS
 
-From a SOC perspective, VPN logs can provide valuable authentication, source, destination, and connection telemetry.
-
----
-
-## 10. Putting the Security Tools Together
-
-A simplified enterprise security architecture can look like this:
+An **Intrusion Detection System (IDS)** identifies suspicious or malicious activity and generates alerts.
 
 ```text
-                         Internet
-                            |
-                         Firewall
-                            |
-                    +-------+-------+
-                    |               |
-                   IDS/IPS        VPN
-                    |               |
-                    +-------+-------+
-                            |
-                 Enterprise Network
-                            |
-        +-------------------+-------------------+
-        |                   |                   |
-     Endpoints           Servers             Cloud
-        |                   |                   |
-       EDR              Sysmon/Logs         Cloud Logs
-        |                   |                   |
-        +-------------------+-------------------+
-                            |
-                            v
-                    Log Collector / Agent
-                            |
-                            v
-                           SIEM
-                            |
-              +-------------+-------------+
-              |             |             |
-           Alerts       Analytics     Investigation
-              |
-              v
-             SOC
-              |
-              v
-            SOAR
-              |
-       Response Actions
+Network Traffic
+      ↓
+     IDS
+      ↓
+Suspicious Pattern
+      ↓
+    ALERT
 ```
 
-No single security product provides complete visibility. The SOC combines telemetry and capabilities from multiple controls to build a broader security picture.
+The primary purpose is detection and alerting.
+
+## 12.6 IPS
+
+An **Intrusion Prevention System (IPS)** can detect suspicious or malicious traffic and actively prevent or block it according to its configuration.
+
+```text
+IDS → Detect → Alert
+
+IPS → Detect → Prevent / Block
+```
+
+Modern network-security platforms can combine IDS and IPS capabilities.
+
+## 12.7 Firewall
+
+A firewall controls network traffic according to security policies.
+
+Policies may consider:
+
+- Source IP
+- Destination IP
+- Source port
+- Destination port
+- Protocol
+- Application
+- User or identity
+- Network zone
+
+Firewall logs can provide evidence about:
+
+- Allowed connections
+- Denied connections
+- Connection attempts
+- Source and destination addresses
+- Ports and protocols
+- Scanning activity
+- Suspicious outbound traffic
+
+Firewall telemetry is therefore valuable for SIEM correlation and incident investigation.
+
+## 12.8 VPN
+
+A **Virtual Private Network (VPN)** provides a protected communication channel between users/devices and networks, depending on the VPN architecture.
+
+From a SOC perspective, VPN logs can provide:
+
+- Authentication attempts
+- Successful authentication
+- Failed authentication
+- User identity
+- Source IP
+- Connection time
+- Session duration
+- Assigned address
+- Gateway information
+
+VPN telemetry can be particularly useful when investigating stolen credentials or unusual remote access.
 
 ---
 
-## 11. Alert-to-Incident Example
+# 13. How the Security Tools Work Together
+
+A SOC should be viewed as an integrated security ecosystem rather than a collection of unrelated products.
+
+```text
+                           INTERNET
+                               |
+                               v
+                           FIREWALL
+                               |
+                         +-----+-----+
+                         |           |
+                       IDS/IPS      VPN
+                         |           |
+                         +-----+-----+
+                               |
+                       ENTERPRISE NETWORK
+                               |
+          +--------------------+--------------------+
+          |                    |                    |
+      ENDPOINTS              SERVERS              CLOUD
+          |                    |                    |
+         EDR              OS / App Logs         Cloud Logs
+          |                    |                    |
+          +--------------------+--------------------+
+                               |
+                               v
+                    LOG COLLECTOR / AGENTS
+                               |
+                               v
+                              SIEM
+                               |
+               +---------------+---------------+
+               |               |               |
+             Alerts         Analytics      Investigation
+               |                               |
+               +---------------+---------------+
+                               |
+                               v
+                              SOC
+                               |
+                               v
+                             SOAR
+                               |
+                               v
+                        RESPONSE ACTIONS
+```
+
+### Why integration matters
+
+Suppose a firewall reports an outbound connection to an unusual IP address. The firewall alone may not provide enough context to determine whether the connection was malicious.
+
+EDR may show that `powershell.exe` created the connection. Identity logs may show which user was logged in. DNS logs may show a suspicious domain lookup immediately before the connection. The SIEM can correlate these observations and provide the analyst with a much stronger investigation trail.
+
+This demonstrates a core SOC principle:
+
+> **Telemetry from different security layers provides context that an individual event cannot provide by itself.**
+
+---
+
+# 14. Example — From Raw Log to Security Incident
 
 Consider a suspected brute-force attack.
 
-### Step 1 — Raw Events
+## Step 1 — Raw Events
 
 ```text
-Failed login — user admin — 10.10.10.50
-Failed login — user admin — 10.10.10.50
-Failed login — user admin — 10.10.10.50
-Failed login — user admin — 10.10.10.50
+10:15:01  Failed login  user=admin  source=10.10.10.50
+10:15:04  Failed login  user=admin  source=10.10.10.50
+10:15:07  Failed login  user=admin  source=10.10.10.50
+10:15:10  Failed login  user=admin  source=10.10.10.50
 ```
 
-### Step 2 — Detection
+Each record is an individual authentication event.
 
-The SIEM identifies repeated authentication failures from the same source.
+## Step 2 — Collection
 
-### Step 3 — Alert
+The authentication system forwards or exposes the events to a collector or SIEM.
+
+## Step 3 — Parsing
+
+The system extracts:
+
+```text
+username   = admin
+source.ip  = 10.10.10.50
+action     = authentication
+result     = failure
+timestamp  = 10:15:01
+```
+
+## Step 4 — Normalization
+
+The data is represented using the fields expected by the security analytics and detection layer.
+
+## Step 5 — Correlation
+
+The detection engine identifies repeated authentication failures from the same source within a defined time window.
+
+## Step 6 — Alert
 
 ```text
 ALERT: Possible brute-force activity
-Source: 10.10.10.50
-Target: admin
-Failures: 20
+Source IP: 10.10.10.50
+Target account: admin
+Failed attempts: 20
+Time window: 5 minutes
 ```
 
-### Step 4 — Triage
+## Step 7 — L1 Triage
 
-The analyst asks:
+The analyst should not immediately declare an incident.
 
-- Is the source expected?
-- Is the target account legitimate?
-- Did authentication eventually succeed?
+The analyst checks:
+
+- Is the source IP expected?
+- Is the account legitimate?
 - Is the source internal or external?
-- Are other accounts affected?
+- Is the user an administrator?
+- Did a successful login occur afterward?
+- Are other accounts being attacked?
+- Is the source attacking multiple systems?
 - What happened immediately before and after the alert?
 
-### Step 5 — Investigation
+## Step 8 — Investigation
 
-Additional telemetry is correlated from authentication logs, endpoint telemetry, firewall logs, VPN logs, and threat intelligence.
+Additional telemetry can be correlated:
 
-### Step 6 — Incident Decision
+```text
+Authentication logs
+       +
+Endpoint telemetry
+       +
+Firewall logs
+       +
+VPN logs
+       +
+DNS logs
+       +
+Threat intelligence
+```
 
-If evidence supports malicious activity, the alert is escalated or classified as a security incident according to organizational procedures.
+Suppose the investigation finds:
 
-### Step 7 — Response
+```text
+Multiple failed logins
+        ↓
+Successful authentication
+        ↓
+New privileged process
+        ↓
+Suspicious PowerShell activity
+        ↓
+Outbound connection to suspicious infrastructure
+```
 
-Potential actions may include account protection, source blocking, endpoint isolation, credential reset, eradication, and recovery—depending on the confirmed attack and authorization model.
+The combined evidence is significantly more concerning than the original failed-login events.
 
-### Step 8 — Improvement
+## Step 9 — Incident Decision
 
-The SOC reviews the detection and investigation to determine whether rules, thresholds, enrichment, or playbooks should be improved.
+If the evidence meets the organization's incident criteria, the alert is escalated or classified as a security incident.
+
+## Step 10 — Response
+
+Depending on the confirmed activity and organizational authorization, response may include:
+
+- Protecting or disabling the compromised account
+- Revoking sessions
+- Isolating an affected endpoint
+- Blocking malicious infrastructure
+- Resetting credentials
+- Removing persistence
+- Investigating additional systems
+- Restoring affected systems
+
+## Step 11 — Improvement
+
+After the incident, the SOC can improve:
+
+- Detection thresholds
+- Correlation rules
+- Threat-intelligence enrichment
+- Investigation playbooks
+- Alert context
+- Endpoint telemetry
+- Authentication monitoring
+
+The complete transformation is:
+
+```text
+Raw Event
+   ↓
+Collected Telemetry
+   ↓
+Parsing
+   ↓
+Normalization
+   ↓
+Enrichment
+   ↓
+Correlation
+   ↓
+Detection
+   ↓
+Alert
+   ↓
+Triage
+   ↓
+Investigation
+   ↓
+Incident
+   ↓
+Response
+   ↓
+Recovery
+   ↓
+Improvement
+```
 
 ---
 
-## 12. Key Takeaways
+# 15. Practical SOC Mindset
 
-1. A SOC combines **people, processes, and technology** to operate security monitoring and response.
-2. The SOC lifecycle moves from **telemetry → detection → alert → triage → investigation → incident response → improvement**.
-3. A **log** is raw recorded telemetry; an **event** represents activity that occurred; an **alert** requires analyst attention; an **incident** is a confirmed or sufficiently credible security situation requiring response.
-4. A SIEM centralizes and processes security telemetry so analysts can search, correlate, detect, and investigate activity.
-5. Log processing commonly involves **collection, parsing, normalization, enrichment, storage/indexing, correlation, and detection**.
-6. Log transfer can use agents, forwarding, Syslog, APIs, file-based collection, and other integration mechanisms.
-7. SIEM, SOAR, EDR, XDR, IDS/IPS, firewalls, VPN systems, and other tools provide complementary visibility and control.
-8. An alert should not automatically be treated as an incident. **Context and investigation matter.**
-9. A mature SOC continuously improves its detections, processes, and response capabilities.
+One of the most important lessons from Day 1 is to think in terms of **evidence, context, and investigation**, rather than simply trusting an alert label.
+
+An analyst should not automatically think:
+
+> "The tool generated a malicious alert, therefore the host is compromised."
+
+Instead, the analyst should ask:
+
+```text
+What happened?
+      ↓
+When did it happen?
+      ↓
+Who was involved?
+      ↓
+Which asset was involved?
+      ↓
+Where did the activity originate?
+      ↓
+What happened before it?
+      ↓
+What happened after it?
+      ↓
+Is this expected behavior?
+      ↓
+What additional telemetry exists?
+      ↓
+What evidence supports the detection?
+      ↓
+What evidence contradicts it?
+      ↓
+What is the scope?
+      ↓
+What is the impact?
+      ↓
+Does it meet incident criteria?
+      ↓
+What response is required?
+```
+
+This investigative mindset is fundamental to SOC operations.
 
 ---
 
-## 13. Day 1 Learning Summary
+# 16. Important Concepts to Remember
 
-Today I focused on understanding the SOC as an operational security function rather than just a collection of tools. I studied the SOC's major responsibilities, analyst tiers, the distinction between logs, events, alerts, incidents, incident response, and disasters, and the role of SIEM and other security technologies.
+## Alert ≠ Incident
 
-I also studied the end-to-end movement of security telemetry: how logs are collected from endpoints, servers, network devices, applications, and cloud systems; how they are parsed and normalized; how additional context can be added; and how correlation and detection logic can turn raw telemetry into actionable alerts for SOC analysts.
+An alert is a signal requiring attention. Investigation determines whether the signal represents meaningful malicious activity.
 
-The main operational concept learned today is that **effective SOC operations depend on converting high-volume raw telemetry into reliable, contextualized, and actionable security decisions.**
+## More Logs ≠ Better Security
+
+Collecting excessive telemetry without a detection and investigation strategy can create noise, storage requirements, and analyst fatigue. The objective is useful and reliable telemetry that supports actual security decisions.
+
+## Context Matters
+
+The same activity can be legitimate or malicious depending on the circumstances.
+
+For example, PowerShell execution could be:
+
+- Normal administration
+- Software deployment
+- Security tooling
+- Malicious execution
+
+The analyst needs context such as user, host, command line, parent process, timing, destination, and surrounding events.
+
+## Correlation Increases Visibility
+
+Multiple related events can reveal an attack sequence that would not be obvious from one event.
+
+## Detection Is Only One Part of SOC Operations
+
+A SOC must also triage, investigate, respond, document, recover, and improve.
 
 ---
 
-## 14. Reference Material
+# 17. Day 1 Knowledge Map
 
-- Day 1 SOC fundamentals study material and diagrams
-- Practical SOC and SIEM concepts studied during the session
+```text
+                         SOC
+                          |
+        +-----------------+------------------+
+        |                 |                  |
+      PEOPLE           PROCESSES          TECHNOLOGY
+        |                 |                  |
+   L1 / L2 / L3      Monitor / Triage       SIEM
+   Manager           Investigate            SOAR
+                     Escalate               EDR
+                     Respond                XDR
+                     Recover                IDS/IPS
+                     Document               Firewall
+                     Improve                VPN
+        |                 |                  |
+        +-----------------+------------------+
+                          |
+                     TELEMETRY
+                          |
+                    Logs / Events
+                          |
+                     SIEM Pipeline
+                          |
+             Parse / Normalize / Enrich
+                          |
+                  Store / Correlate
+                          |
+                       Detect
+                          |
+                        Alert
+                          |
+                       Analyst
+                          |
+                    Investigation
+                          |
+                       Incident
+                          |
+                  Incident Response
+                          |
+                  Recovery / Lessons
+                          |
+                   Detection Improvement
+```
+
+---
+
+# 18. Key Takeaways
+
+1. A SOC is an **operational security function**, not merely a software product.
+2. A SOC combines **people, processes, and technology**.
+3. Continuous monitoring provides visibility across endpoints, servers, identities, networks, applications, and cloud environments.
+4. Threat detection can use signatures, rules, correlation, behavioral analytics, threat intelligence, and anomaly detection.
+5. L1 analysts generally focus on initial alert triage and escalation.
+6. L2 analysts perform deeper investigation and cross-source correlation.
+7. L3 analysts handle advanced investigation, threat hunting, detection engineering, malware analysis, and forensics.
+8. SOC managers coordinate people, processes, metrics, strategy, and operational effectiveness.
+9. A **log** is recorded information describing system or security activity.
+10. An **event** represents activity that occurred.
+11. An **alert** is a security signal requiring analyst attention.
+12. An **incident** is activity that meets the organization's criteria for security response.
+13. **An alert should not automatically be treated as an incident.**
+14. Incident response provides a structured process for handling security incidents.
+15. Disaster recovery focuses on restoring critical operations after major disruption.
+16. A SIEM centralizes security telemetry and supports search, correlation, detection, alerting, analytics, and investigation.
+17. SIEM processing commonly involves **collection → parsing → normalization → enrichment → storage/indexing → correlation/detection → alerting**.
+18. Log management primarily focuses on collection, transport, storage, search, and retention, while SIEM adds security-focused detection and investigation capabilities.
+19. Logs can be transferred using agents, forwarding, Syslog/network logging, APIs, file-based collection, collectors, and cloud integrations.
+20. EDR provides endpoint visibility and response capabilities.
+21. XDR correlates security telemetry across multiple security domains.
+22. IDS primarily detects and alerts, while IPS can actively prevent or block activity.
+23. Firewalls enforce network-access policies and generate valuable security telemetry.
+24. VPN systems generate authentication and connection telemetry useful during investigations.
+25. SOAR can automate repetitive investigation and response workflows.
+26. No single security product provides complete visibility.
+27. Effective SOC operations depend on **context, correlation, evidence, and disciplined investigation**.
+
+---
+
+# 19. Day 1 Learning Summary
+
+Today I studied the fundamentals of Security Operations Center operations and how a SOC functions as an integrated security capability.
+
+I learned that a SOC combines **people, processes, and technology** to continuously monitor an organization's environment, identify suspicious activity, investigate alerts, respond to incidents, document findings, and improve security operations over time.
+
+I studied the responsibilities of L1, L2, L3, and SOC management. L1 focuses primarily on initial alert triage and escalation, L2 performs deeper investigation and correlation, L3 handles advanced investigations and specialized activities such as threat hunting, detection engineering, malware analysis, and digital forensics, while the SOC manager focuses on operational leadership, metrics, processes, staffing, and strategy.
+
+I learned the operational difference between **logs, events, alerts, incidents, incident response, and disasters**. A log is recorded telemetry, an event represents activity that occurred, an alert is a security signal requiring attention, and an incident is activity that meets the organization's criteria for security response. A key lesson is that an alert is a starting point for investigation rather than automatic proof of compromise.
+
+A major part of the day was understanding how a SIEM processes security data. Telemetry is collected from endpoints, servers, applications, network devices, firewalls, VPN systems, identity systems, cloud services, EDR, IDS/IPS, and other sources. The data can then be parsed, normalized, enriched, stored/indexed, and evaluated through detection and correlation logic. When detection criteria are satisfied, an alert is generated and enters the SOC investigation workflow.
+
+I also studied the difference between **log management and SIEM**. Log management focuses primarily on collecting, transporting, storing, indexing, searching, and retaining logs, whereas SIEM adds security-focused correlation, detection, alerting, analytics, and investigation capabilities.
+
+I learned that logs can be transferred through several mechanisms, including agent-based collection, log forwarding, network-based logging such as Syslog, APIs, file-based collection, intermediate collectors, and cloud-native integrations. The method depends on the architecture, source system, security requirements, and capabilities of the receiving platform.
+
+Finally, I studied how SIEM, SOAR, EDR, XDR, IDS, IPS, firewalls, VPN systems, and other security technologies complement one another. The most important operational principle is that **security telemetry becomes significantly more useful when events from different sources are correlated and interpreted in context**.
+
+The overall SOC workflow learned today is:
+
+```text
+Monitor
+   ↓
+Collect
+   ↓
+Process
+   ↓
+Detect
+   ↓
+Alert
+   ↓
+Triage
+   ↓
+Investigate
+   ↓
+Classify
+   ↓
+Respond
+   ↓
+Recover
+   ↓
+Document
+   ↓
+Improve
+```
+
+---
+
+# 20. Reference Material
+
+- Day 1 SOC fundamentals study material and diagrams provided during the learning session.
+- Topics covered during the Day 1 practical study session.
