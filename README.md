@@ -35,7 +35,7 @@ Build practical experience across:
 
 | Day | Focus | Status |
 |---|---|---|
-| Day 1 | SOC Fundamentals | ⬜ |
+| Day 1 | SOC Fundamentals | ✅ |
 | Day 2 | Networking for SOC | ⬜ |
 | Day 3 | Linux Fundamentals | ⬜ |
 | Day 4 | Windows Fundamentals | ⬜ |
@@ -69,6 +69,10 @@ Build practical experience across:
 ## 📂 Daily Documentation
 
 Each day will document the practical work completed, including concepts, tools, lab configuration, commands, detections, investigations, findings, and lessons learned.
+
+### Completed
+
+- [Day 1 — SOC Fundamentals](01-SOC-Fundamentals/README.md)
 
 ## 🚀 Goal
 
