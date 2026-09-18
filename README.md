@@ -37,7 +37,7 @@ Build practical experience across:
 |---|---|---|
 | Day 1 | SOC Fundamentals | ✅ |
 | Day 2 | Networking for SOC | ✅ |
-| Day 3 | Linux Fundamentals | ⬜ |
+| Day 3 | Linux Fundamentals | ✅ |
 | Day 4 | Windows Fundamentals | ⬜ |
 | Day 5 | Windows Event Logs | ⬜ |
 | Day 6 | Sysmon | ⬜ |
@@ -74,6 +74,7 @@ Each day will document the practical work completed, including concepts, tools, 
 
 - [Day 1 — SOC Fundamentals](01-SOC-Fundamentals/README.md)
 - [Day 2 — Networking for SOC](02-Networking-for-SOC/README.md)
+- [Day 3 — Linux Fundamentals](03-Linux-Fundamentals/README.md)
 
 ## 🚀 Goal
 
