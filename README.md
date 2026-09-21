@@ -39,7 +39,7 @@ Build practical experience across:
 | Day 2 | Networking for SOC | ✅ |
 | Day 3 | Linux Fundamentals | ✅ |
 | Day 4 | Windows Fundamentals | ✅ |
-| Day 5 | Windows Event Logs | ⬜ |
+| Day 5 | Windows Event Logs | ✅ |
 | Day 6 | Sysmon | ⬜ |
 | Day 7 | Active Directory | ⬜ |
 | Day 8 | Active Directory Attacks & Detection | ⬜ |
@@ -76,6 +76,7 @@ Each day will document the practical work completed, including concepts, tools, 
 - [Day 2 — Networking for SOC](02-Networking-for-SOC/README.md)
 - [Day 3 — Linux Fundamentals](03-Linux-Fundamentals/README.md)
 - [Day 4 — Windows Fundamentals](04-Windows-Fundamentals/README.md)
+- [Day 5 — Windows Event Logs](05-Windows-Event-Logs/README.md)
 
 ## 🚀 Goal
 
