@@ -41,7 +41,7 @@ Build practical experience across:
 | Day 4 | Windows Fundamentals | ✅ |
 | Day 5 | Windows Event Logs | ✅ |
 | Day 6 | Sysmon | ✅ |
-| Day 7 | Active Directory | ⬜ |
+| Day 7 | Active Directory | ✅ |
 | Day 8 | Active Directory Attacks & Detection | ⬜ |
 | Day 9 | Wazuh Architecture | ⬜ |
 | Day 10 | Wazuh Agent Deployment | ⬜ |
@@ -78,6 +78,7 @@ Each day will document the practical work completed, including concepts, tools, 
 - [Day 4 — Windows Fundamentals](04-Windows-Fundamentals/README.md)
 - [Day 5 — Windows Event Logs](05-Windows-Event-Logs/README.md)
 - [Day 6 — Sysmon](06-Sysmon/README.md)
+- [Day 7 — Active Directory](07-Active-Directory/README.md)
 
 ## 🚀 Goal
 
